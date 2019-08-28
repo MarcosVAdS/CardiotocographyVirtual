@@ -1,13 +1,11 @@
 import matplotlib.pyplot as plt
 
-
-
 class GeraGrafico:
-
     def __init__(self, plt):
         self.x = []
         self.y = []
         self.position = (0,0)
+        self.line = []
         self.click = False
         self.fig, self.ax = plt.subplots()
         self.ax.axis((-500, 500, 0, 500))
@@ -29,20 +27,28 @@ class GeraGrafico:
 
 
     def onclick(self, event):
-        x, y = self.gera_valores(int(event.xdata), int(event.ydata))
-        self.position = (int(event.xdata), int(event.ydata))
-        self.ax.plot(x, y)
-        event.canvas.draw()
         self.click = True
+        for line in self.ax.lines:
+            if int(event.xdata) in line.get_xdata() and int(event.ydata) in line.get_ydata():
+                self.line = line
+                break
+
+        else:
+            x, y = self.gera_valores(int(event.xdata), int(event.ydata))
+            self.position = (int(event.xdata), int(event.ydata))
+            self.ax.plot(x, y)
+            event.canvas.draw()
+
+
 
     def onrelease(self, event):
         self.click = False
 
     def onmotion(self, event):
-        for line in self.ax.lines:
-            for x, y in zip(line.get_xdata(), line.get_ydata()):
-                if self.position[0] == x and self.position[1] == y:
-                    print('tocando no grafico')
+        if self.click:
+            x, y = self.gera_valores(int(event.xdata), int(event.ydata))
+            self.line.set_data(x, y)
+            event.canvas.draw()
 
 
         '''
