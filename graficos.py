@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
 class GeraGrafico:
     def __init__(self, plt):
@@ -7,11 +8,16 @@ class GeraGrafico:
         self.position = (0,0)
         self.line = []
         self.click = False
+
         self.fig, self.ax = plt.subplots()
-        self.ax.axis((-500, 500, 0, 500))
+        self.ax.axis((0, 1200, 0, 250))
+        self.ax.grid()
         self.fig.canvas.mpl_connect('button_press_event', self.onclick)
         self.fig.canvas.mpl_connect('button_release_event', self.onrelease)
         self.fig.canvas.mpl_connect('motion_notify_event', self.onmotion)
+
+        plt.yticks(np.arange(60, 180, 10))
+        plt.xticks(np.arange(0, 1200, 30))
         plt.show()
 
 
@@ -34,9 +40,9 @@ class GeraGrafico:
                 break
 
         else:
-            x, y = self.gera_valores(int(event.xdata), int(event.ydata))
+            x, y = self.gera_valores(int(event.xdata), int(event.ydata), amostras=5)
             self.position = (int(event.xdata), int(event.ydata))
-            self.ax.plot(x, y)
+            self.line = self.ax.plot(x, y)
             event.canvas.draw()
 
 
@@ -46,7 +52,7 @@ class GeraGrafico:
 
     def onmotion(self, event):
         if self.click:
-            x, y = self.gera_valores(int(event.xdata), int(event.ydata))
+            x, y = self.gera_valores(int(event.xdata), int(event.ydata), amostras=5)
             self.line.set_data(x, y)
             event.canvas.draw()
 
