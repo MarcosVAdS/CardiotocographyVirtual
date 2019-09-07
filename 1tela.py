@@ -1,5 +1,6 @@
 from tkinter import *
-import matplotlib.pyplot
+import matplotlib.pyplot as plt
+from graficos import GeraGrafico
 
 class Aplicacao:
     def __init__(self, master=None):
@@ -20,12 +21,15 @@ class Aplicacao:
         self.tutorialButton.pack(side="bottom", expand=1)
 
     def plot(self):
+        '''
         meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho']
         valores = [105235, 107697, 110256, 109236, 108859, 109986]
 
         matplotlib.pyplot.plot(meses,valores)
         matplotlib.pyplot.show()
+        '''
 
+        GeraGrafico(plt)
 
 root = Tk()
 root.title("CTGvirtual")
