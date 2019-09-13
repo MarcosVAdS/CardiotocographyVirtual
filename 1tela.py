@@ -1,6 +1,8 @@
 from tkinter import *
 import matplotlib.pyplot as plt
 from graficos import GeraGrafico
+from matplotlib.backends.backend_tkagg import (
+    FigureCanvasTkAgg, NavigationToolbar2Tk)
 
 class Aplicacao:
     def __init__(self):
@@ -10,8 +12,8 @@ class Aplicacao:
         self.root["bg"] = ("#5271FF")
 
         self.home_frame = HomeFrame(master=self.root, controller=self)
-        self.config_frame = None
-        self.plot_frame = None
+        self.config_frame = ConfigFrame(master=self.root, controller=self)
+        self.plot_frame = PlotFrame(master=self.root, controller=self)
 
         self.actual_frame = self.home_frame
         self.actual_frame.pack()
@@ -47,7 +49,7 @@ class HomeFrame(Frame):
 
     def show_config_frame(self):
         self.controller.actual_frame.destroy()
-        self.controller.actual_frame = ConfigFrame(self.root, self.controller)
+        self.controller.actual_frame = self.controller.plot_frame
         self.controller.actual_frame.pack()
 
 class ConfigFrame(Frame):
@@ -55,11 +57,44 @@ class ConfigFrame(Frame):
         Frame.__init__(self, master)
         self["bg"] = ("#5271FF")
 
+class PlotFrame(Frame):
+    def __init__(self, master, controller):
+        Frame.__init__(self, master)
+        self["bg"] = ("#5271FF")
+
+        self.graficos = GeraGrafico(plt.figure())
+        self.canvas = FigureCanvasTkAgg(self.graficos.fig, master=master)
+        self.canvas.draw()
+
+        self.canvas.mpl_connect('button_press_event', self.graficos.onclick)
+        self.bind("<Button-1>", self.graficos.onclick)
+
+        self.canvas.mpl_connect('button_release_event', self.graficos.onrelease)
+        self.bind("<ButtonRelease-1>", self.graficos.onrelease)
+
+        self.canvas.mpl_connect('motion_notify_event', self.graficos.onmotion)
+        self.bind("<Motion>", self.graficos.onmotion)
+
+        self.canvas.mpl_connect('key_press_event', self.graficos.key_press)
+        self.bind("<Key>", self.graficos.key_press)
+
+        self.calc_button = Button(master, text="INICIAR", width=20)
+        self.calc_button["command"] = self.calc_baseline
 
 
+        self.baseline = Entry(master)
+
+    def calc_baseline(self):
+        value = int(self.baseline.get())
+        self.graficos.gera_baseline(value)
+        self.canvas.get_tk_widget().focus_force()
+        self.canvas.draw()
 
 
-
+    def pack(self):
+        self.canvas.get_tk_widget().pack(fill=BOTH, expand=1)
+        self.calc_button.pack()
+        self.baseline.pack()
 
 
 if __name__ == '__main__':

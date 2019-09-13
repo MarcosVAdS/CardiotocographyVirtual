@@ -10,6 +10,7 @@ class GeraGrafico:
         self.position = (0,0)
         self.line = []
         self.click = False
+        self.baseline = None
 
         self.fig = figure
 
@@ -134,8 +135,8 @@ class GeraGrafico:
             for line, text in zip(self.ax2.lines, self.ax2.texts):
                 x, y = min(line.get_xdata()), min(line.get_ydata())
                 pico_x = [value for value in range(x - 10, x + 11)]
-                pico_y1 = [value for value in range(20, y + 1)]
-                pico_y2 = [value for value in range(y, 20)]
+                pico_y1 = [value for value in range(y - 10, y + 1)]
+                pico_y2 = [value for value in range(y, y - 10, -1)]
 
                 for valor_x, valor_y in zip(pico_x, pico_y1 + pico_y2):
                     valores[valor_x] = valor_y
@@ -156,6 +157,17 @@ class GeraGrafico:
             self.ax2.texts.clear()
             self.count = 1
             event.canvas.draw()
+
+    def gera_baseline(self, value):
+        if self.baseline is None:
+            self.baseline = self.ax1.add_line(Line2D(np.arange(0, 300, 1), np.full(shape=300, fill_value=value, dtype=np.int)))
+
+        else:
+            try:
+                self.baseline.remove()
+                self.baseline = self.ax1.add_line(Line2D(np.arange(0, 300, 1), np.full(shape=300, fill_value=value, dtype=np.int)))
+            except:
+                self.baseline = self.ax1.add_line(Line2D(np.arange(0, 300, 1), np.full(shape=300, fill_value=value, dtype=np.int)))
 
 
 if '__main__' == __name__:
