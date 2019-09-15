@@ -5,25 +5,33 @@ from matplotlib.figure import Figure
 
 class GeraGrafico:
     def __init__(self, figure):
-        self.x = []
-        self.y = []
-        self.position = (0,0)
-        self.line = []
+        self.line = None
         self.click = False
         self.baseline = None
 
+        self.duration = 600
+        self.variability = 10
+
         self.fig = figure
 
-        self.ax1 = self.fig.add_subplot(211)
-        self.ax1.axis((0, 300, 0, 250))
+        self.ax1 = self.fig.add_subplot(211, adjustable='box')
+        print(dir(self.ax1))
+        self.ax1.axis((0, self.duration, 40, 200))
         self.ax1.grid()
-        self.ax1.set_xticks(np.arange(0, 300, 30))
-        self.ax1.set_yticks(np.arange(60, 180, 10))
+
+        self.ax1.set_xticks(np.arange(0, self.duration, 30))
+        self.ax1.get_xaxis().set_ticklabels([])
+        self.ax1.set_yticks(np.arange(60, 200, 10))
+        #self.ax1.get_yaxis().set_ticklabels([])
 
 
-        self.ax2 = self.fig.add_subplot(212)
-        self.ax2.axis((0, 300, 0, 100))
+        self.ax2 = self.fig.add_subplot(212, adjustable='box')
+        self.ax2.axis((0, self.duration, 0, 100))
         self.ax2.grid()
+        self.ax2.set_xticks(np.arange(0, self.duration, 30))
+        self.ax2.get_xaxis().set_ticklabels([])
+
+        self.ax2.set_yticks(np.arange(0, 100, 10))
 
 
         self.annotate = None
@@ -33,79 +41,83 @@ class GeraGrafico:
         self.fig.canvas.mpl_connect('motion_notify_event', self.onmotion)
         self.fig.canvas.mpl_connect('key_press_event', self.key_press)
 
-
+        self.rad = 10
 
     def gera_valores(self, x, y, amostras=30 ):
         y1 = [n for n in range(y + amostras, y, -1)]
         y2 = [n for n in range(y, y + amostras + 1)]
+        x = [n for n in range(x - amostras, x + amostras + 1)]
 
-        self.x = [n for n in range(x - amostras, x + amostras + 1)]
-        self.y = y1 + y2
-
-        return (self.x, self.y)
-
-
+        return (x, y1 + y2)
 
     def onclick(self, event):
         self.click = True
         if event.inaxes == self.ax1:
             for line, text in zip(self.ax1.lines, self.ax1.texts):
-                if int(event.xdata) in line.get_xdata() and int(event.ydata) in line.get_ydata():
+                contem, art = line.contains(event)
+                if contem:
+                    line.set_picker(self.rad)
+                    line.set_pickradius(self.rad)
                     self.line = line
                     self.annotate = text
                     break
 
             else:
-                x, y = self.gera_valores(int(event.xdata), int(event.ydata), amostras=1)
-                self.position = (int(event.xdata), int(event.ydata))
-                self.line = self.ax1.add_line(Line2D(x, y))
+                x, y = self.gera_valores(int(event.xdata), int(event.ydata), amostras=0)
+                self.line = self.ax1.add_line(Line2D(x, y, marker="o"))
+
+                self.line.set_picker(self.rad)
+                self.line.set_pickradius(self.rad)
                 self.annotate = self.ax1.annotate(str(self.count), xy=(event.xdata, event.ydata),
-                                                  xytext=(event.xdata + 5, event.ydata + 5))
+                                                          xytext=(event.xdata + 5, event.ydata + 5))
                 self.count += 1
                 event.canvas.draw()
 
-
-
         elif event.inaxes == self.ax2:
             for line, text in zip(self.ax2.lines, self.ax2.texts):
-                if int(event.xdata) in line.get_xdata() and int(event.ydata) in line.get_ydata():
+                contem, art = line.contains(event)
+                if contem:
+                    line.set_picker(self.rad)
+                    line.set_pickradius(self.rad)
                     self.line = line
                     self.annotate = text
                     break
 
             else:
-                x, y = self.gera_valores(int(event.xdata), int(event.ydata), amostras=1)
-                self.position = (int(event.xdata), int(event.ydata))
-                self.line = self.ax2.add_line(Line2D(x, y))
+                x, y = self.gera_valores(int(event.xdata), int(event.ydata), amostras=0)
+                self.line = self.ax2.add_line(Line2D(x, y, marker="o"))
+                self.line.set_picker(self.rad)
+                self.line.set_pickradius(self.rad)
                 self.annotate = self.ax2.annotate(str(self.count), xy=(event.xdata, event.ydata),
                                                   xytext=(event.xdata + 5, event.ydata + 5))
                 self.count += 1
                 event.canvas.draw()
 
-
-
-
-
     def onrelease(self, event):
         self.click = False
 
-
     def onmotion(self, event):
-        if self.click and event.inaxes == self.ax1:
-            x, y = self.gera_valores(int(event.xdata), int(event.ydata), amostras=1)
-            self.line.set_data(x, y)
-            self.annotate.set_x(event.xdata + 5)
-            self.annotate.set_y(event.ydata + 5)
-            event.canvas.draw()
+        if self.click and event.inaxes == self.ax1 and self.line is not None:
+            for line, text in zip(self.ax1.lines, self.ax1.texts):
+                contem, art = line.contains(event)
+                if contem:
+                    x, y = self.gera_valores(int(event.xdata), int(event.ydata), amostras=0)
+                    line.set_data(x, y)
+                    text.set_x(event.xdata + 5)
+                    text.set_y(event.ydata + 5)
+                    event.canvas.draw()
+                    return
 
-        elif self.click and event.inaxes == self.ax2:
-            x, y = self.gera_valores(int(event.xdata), int(event.ydata), amostras=1)
-            self.line.set_data(x, y)
-            self.annotate.set_x(event.xdata + 5)
-            self.annotate.set_y(event.ydata + 5)
-            event.canvas.draw()
-
-
+        elif self.click and event.inaxes == self.ax2 and self.line is not None:
+            for line, text in zip(self.ax2.lines, self.ax2.texts):
+                contem, art = line.contains(event)
+                if contem:
+                    x, y = self.gera_valores(int(event.xdata), int(event.ydata), amostras=0)
+                    line.set_data(x, y)
+                    text.set_x(event.xdata + 5)
+                    text.set_y(event.ydata + 5)
+                    event.canvas.draw()
+                    return
 
     def key_press(self, event):
         if event.key == 'enter':
@@ -116,21 +128,21 @@ class GeraGrafico:
             for line, text in zip(self.ax1.lines, self.ax1.texts):
                 x, y = min(line.get_xdata()), min(line.get_ydata())
                 amostras += np.arange(inicio, x, 1).tolist()
-                valores += np.random.randint(y - 20, y + 20, x - inicio).tolist()
+                valores += np.random.randint(y - self.variability, y + self.variability, x - inicio).tolist()
                 inicio = x
 
             self.ax1.lines.clear()
             self.ax1.texts.clear()
             self.count = 1
 
-            amostras += np.arange(inicio, 300, 1).tolist()
-            valores += np.random.randint(110, 150, 300 - x).tolist()
+            amostras += np.arange(inicio, self.duration, 1).tolist()
+            valores += np.random.randint(120, 140, self.duration - x).tolist()
 
             self.ax1.plot(amostras, valores, color='green')
 
             inicio = 0
-            amostras = np.arange(inicio, 300, 1).tolist()
-            valores = np.full(shape=300, fill_value=20, dtype=np.int).tolist()
+            amostras = np.arange(inicio, self.duration, 1).tolist()
+            valores = np.full(shape=self.duration, fill_value=20, dtype=np.int).tolist()
 
             for line, text in zip(self.ax2.lines, self.ax2.texts):
                 x, y = min(line.get_xdata()), min(line.get_ydata())
@@ -160,14 +172,14 @@ class GeraGrafico:
 
     def gera_baseline(self, value):
         if self.baseline is None:
-            self.baseline = self.ax1.add_line(Line2D(np.arange(0, 300, 1), np.full(shape=300, fill_value=value, dtype=np.int)))
+            self.baseline = self.ax1.add_line(Line2D(np.arange(0, self.duration, 1), np.full(shape=self.duration, fill_value=value, dtype=np.int)))
 
         else:
             try:
                 self.baseline.remove()
-                self.baseline = self.ax1.add_line(Line2D(np.arange(0, 300, 1), np.full(shape=300, fill_value=value, dtype=np.int)))
+                self.baseline = self.ax1.add_line(Line2D(np.arange(0, self.duration, 1), np.full(shape=self.duration, fill_value=value, dtype=np.int)))
             except:
-                self.baseline = self.ax1.add_line(Line2D(np.arange(0, 300, 1), np.full(shape=300, fill_value=value, dtype=np.int)))
+                self.baseline = self.ax1.add_line(Line2D(np.arange(0, self.duration, 1), np.full(shape=self.duration, fill_value=value, dtype=np.int)))
 
 
 if '__main__' == __name__:

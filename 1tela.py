@@ -48,22 +48,52 @@ class HomeFrame(Frame):
         self.tutorialButton.pack(pady=20)
 
     def show_config_frame(self):
-        self.controller.actual_frame.destroy()
-        self.controller.actual_frame = self.controller.plot_frame
-        self.controller.actual_frame.pack()
+        self.controller.actual_frame.pack_forget()
+        self.controller.actual_frame = self.controller.config_frame
+        self.controller.actual_frame.pack(fill=BOTH)
 
 class ConfigFrame(Frame):
     def __init__(self, master, controller):
         Frame.__init__(self, master)
+        self.root = master
+        self.controller = controller
         self["bg"] = ("#5271FF")
+
+
+        self.text = Label(self, text='Configurações')
+        self.text.pack()
+
+        self.avancar = Button(self, text='Avançar')
+        self.avancar["command"] = self.show_plot_frame
+        self.avancar["width"] = 20
+        self.avancar.pack(side=LEFT, padx=100, pady=300)
+
+        self.voltar = Button(self, text='Voltar')
+        self.voltar["command"] = self.show_home_frame
+        self.voltar["width"] = 20
+        self.voltar.pack(side=LEFT, padx=10, pady=300)
+
+    def show_home_frame(self):
+        self.controller.actual_frame.pack_forget()
+        self.controller.actual_frame = self.controller.home_frame
+        self.controller.actual_frame.pack(fill=BOTH, expand=1)
+
+    def show_plot_frame(self):
+        self.controller.actual_frame.pack_forget()
+        self.controller.actual_frame = self.controller.plot_frame
+        self.controller.actual_frame.pack(fill=BOTH, expand=1)
+
 
 class PlotFrame(Frame):
     def __init__(self, master, controller):
         Frame.__init__(self, master)
+        self.root = master
+        self.controller = controller
+
         self["bg"] = ("#5271FF")
 
         self.graficos = GeraGrafico(plt.figure())
-        self.canvas = FigureCanvasTkAgg(self.graficos.fig, master=master)
+        self.canvas = FigureCanvasTkAgg(self.graficos.fig, master=self)
         self.canvas.draw()
 
         self.canvas.mpl_connect('button_press_event', self.graficos.onclick)
@@ -78,11 +108,15 @@ class PlotFrame(Frame):
         self.canvas.mpl_connect('key_press_event', self.graficos.key_press)
         self.bind("<Key>", self.graficos.key_press)
 
-        self.calc_button = Button(master, text="INICIAR", width=20)
+        self.baseline = Entry(self)
+
+        self.calc_button = Button(self, text="Plotar Linha de Base", width=20)
         self.calc_button["command"] = self.calc_baseline
 
+        self.canvas.get_tk_widget().pack(fill=BOTH, expand=1)
+        self.calc_button.pack(side=RIGHT, padx=10, pady=10)
+        self.baseline.pack(side=RIGHT, padx=10, pady=10 )
 
-        self.baseline = Entry(master)
 
     def calc_baseline(self):
         value = int(self.baseline.get())
@@ -91,10 +125,6 @@ class PlotFrame(Frame):
         self.canvas.draw()
 
 
-    def pack(self):
-        self.canvas.get_tk_widget().pack(fill=BOTH, expand=1)
-        self.calc_button.pack()
-        self.baseline.pack()
 
 
 if __name__ == '__main__':
