@@ -124,25 +124,34 @@ class GeraGrafico:
     def key_press(self, event):
         if event.key == 'enter':
             # gera para o grafico de batimemntos
-            inicio = 0
+            inicio_x = 0
+            inicio_y = 120
             amostras = []
             valores = []
 
             for line, text in zip(self.ax1.lines, self.ax1.texts):
                 x, y = min(line.get_xdata()), min(line.get_ydata())
-                amostras += np.arange(inicio, x, 1).tolist()
-                valores += np.random.randint(y - self.variability, y + self.variability, x - inicio).tolist()
-                inicio = x
+                amostras += np.arange(inicio_x, x, 1).tolist()
+                valores += [v + r for v, r in zip(np.linspace(inicio_y, y, x - inicio_x).tolist(),
+                                                  np.random.randint(-self.variability, self.variability,
+                                                                    x - inicio_x).tolist())]
+
+                inicio_x = x
+                inicio_y = y
 
             self.ax1.lines.clear()
             self.ax1.texts.clear()
             self.count = 1
 
-            amostras += np.arange(inicio, self.duration, 1).tolist()
-            valores += np.random.randint(120, 140, self.duration - x).tolist()
+            amostras += np.arange(inicio_x, self.duration, 1).tolist()
+            valores += [v + r for v, r in zip(np.linspace(inicio_y, 120, self.duration - inicio_x).tolist(),
+                                              np.random.randint(-self.variability, self.variability,
+                                                                self.duration - inicio_x).tolist())]
+
+            print(len(amostras))
+            print(len(valores))
 
             self.ax1.plot(amostras, valores, color='green')
-
 
             #gera para o grafico de contração
             inicio = 0
