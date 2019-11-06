@@ -1,3 +1,5 @@
+import math
+import scipy.stats as stats
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import numpy as np
@@ -121,6 +123,7 @@ class GeraGrafico:
 
     def key_press(self, event):
         if event.key == 'enter':
+            # gera para o grafico de batimemntos
             inicio = 0
             amostras = []
             valores = []
@@ -140,25 +143,32 @@ class GeraGrafico:
 
             self.ax1.plot(amostras, valores, color='green')
 
+
+            #gera para o grafico de contração
             inicio = 0
-            amostras = np.arange(inicio, self.duration, 1).tolist()
-            valores = np.full(shape=self.duration, fill_value=20, dtype=np.int).tolist()
+            amostras = []
+            valores = []
+
+            scale = 20            #curvatura da parte superior
+            factor = 2.5 * scale  #regulação da amplitude
+
 
             for line, text in zip(self.ax2.lines, self.ax2.texts):
                 x, y = min(line.get_xdata()), min(line.get_ydata())
-                pico_x = [value for value in range(x - 10, x + 11)]
-                pico_y1 = [value for value in range(y - 10, y + 1)]
-                pico_y2 = [value for value in range(y, y - 10, -1)]
+                plot_x = np.linspace(x - 80, x + 80, 1000)
+                plot_y = stats.norm.pdf(plot_x, x, scale) * y * factor
 
-                for valor_x, valor_y in zip(pico_x, pico_y1 + pico_y2):
-                    valores[valor_x] = valor_y
+                amostras.append(plot_x)
+                valores.append(plot_y)
 
 
             self.ax2.lines.clear()
             self.ax2.texts.clear()
             self.count = 1
 
-            self.ax2.plot(amostras, valores, color='green')
+            for amostra, valor in zip(amostras, valores):
+                self.ax2.plot(amostra, valor, color='green')
+
 
             event.canvas.draw()
 
