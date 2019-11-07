@@ -17,24 +17,24 @@ class GeraGrafico:
         self.fig = figure
 
         self.ax1 = self.fig.add_subplot(211, adjustable='box')
-        print(dir(self.ax1))
         self.ax1.axis((0, self.duration, 40, 200))
         self.ax1.grid()
-
         self.ax1.set_xticks(np.arange(0, self.duration, 30))
-        self.ax1.get_xaxis().set_ticklabels([])
+        self.ax1.get_xaxis().set_ticklabels([num for num in range(0, 22)])
         self.ax1.set_yticks(np.arange(60, 200, 10))
-        #self.ax1.get_yaxis().set_ticklabels([])
+        self.ax1.set_title('Frequência cardíaca fetal')
+        self.ax1.set_ylabel('bpm')
 
 
         self.ax2 = self.fig.add_subplot(212, adjustable='box')
         self.ax2.axis((0, self.duration, 0, 100))
         self.ax2.grid()
         self.ax2.set_xticks(np.arange(0, self.duration, 30))
-        self.ax2.get_xaxis().set_ticklabels([])
-
+        self.ax2.get_xaxis().set_ticklabels([num for num in range(0, 22)])
         self.ax2.set_yticks(np.arange(0, 100, 10))
-
+        self.ax2.set_title('Contrações uterinas')
+        self.ax2.set_xlabel('Tempo [min]')
+        self.ax2.set_ylabel('a.u.')
 
         self.annotate = None
         self.count = 1

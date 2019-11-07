@@ -10,10 +10,12 @@ class Aplicacao:
         self.root.title("CTGvirtual")
         self.root.geometry("1280x720")
         self.root["bg"] = ("#5271FF")
+        self.root.protocol('WM_DELETE_WINDOW', self.root.quit)
 
         self.home_frame = HomeFrame(master=self.root, controller=self)
         self.config_frame = ConfigFrame(master=self.root, controller=self)
         self.plot_frame = PlotFrame(master=self.root, controller=self)
+        self.tutorial_frame = TutorialFrame(master=self.root, controller=self)
 
         self.actual_frame = self.home_frame
         self.actual_frame.pack()
@@ -45,12 +47,19 @@ class HomeFrame(Frame):
         self.tutorialButton["font"] = ("Arial", "30")
         self.tutorialButton["width"] = 20
         self.tutorialButton["bg"] = ("white")
+        self.tutorialButton["command"] = self.show_tutorial_frame
         self.tutorialButton.pack(pady=20)
+
 
     def show_config_frame(self):
         self.controller.actual_frame.pack_forget()
         self.controller.actual_frame = self.controller.config_frame
-        self.controller.actual_frame.pack(fill=BOTH)
+        self.controller.actual_frame.show_plot_frame()
+
+    def show_tutorial_frame(self):
+        self.controller.actual_frame.pack_forget()
+        self.controller.actual_frame = self.controller.tutorial_frame
+
 
 class ConfigFrame(Frame):
     def __init__(self, master, controller):
@@ -124,6 +133,13 @@ class PlotFrame(Frame):
         self.canvas.get_tk_widget().focus_force()
         self.canvas.draw()
 
+class TutorialFrame(Frame):
+    def __init__(self, master, controller):
+        Frame.__init__(self, master)
+        self.root = master
+        self.controller = controller
+
+        self["bg"] = ("#5271FF")
 
 
 
