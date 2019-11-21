@@ -4,6 +4,8 @@ from graficos import GeraGrafico
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
 
+from PIL import ImageTk, Image
+
 class Aplicacao:
     def __init__(self):
         self.root = Tk()
@@ -59,6 +61,7 @@ class HomeFrame(Frame):
     def show_tutorial_frame(self):
         self.controller.actual_frame.pack_forget()
         self.controller.actual_frame = self.controller.tutorial_frame
+        self.controller.actual_frame.pack(fill=BOTH, expand=1)
 
 
 class ConfigFrame(Frame):
@@ -91,7 +94,6 @@ class ConfigFrame(Frame):
         self.controller.actual_frame.pack_forget()
         self.controller.actual_frame = self.controller.plot_frame
         self.controller.actual_frame.pack(fill=BOTH, expand=1)
-
 
 class PlotFrame(Frame):
     def __init__(self, master, controller):
@@ -138,8 +140,16 @@ class TutorialFrame(Frame):
         Frame.__init__(self, master)
         self.root = master
         self.controller = controller
-
         self["bg"] = ("#5271FF")
+
+        image = Image.open("images/tela_de_plot.jpg")
+        photo = ImageTk.PhotoImage(image)
+
+        self.canvas = Canvas(self, width=image.width, height=image.height)
+        self.canvas.create_image(0, 0, image=photo)
+        self.canvas.pack()
+
+
 
 
 

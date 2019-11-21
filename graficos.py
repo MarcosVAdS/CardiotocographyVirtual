@@ -10,14 +10,16 @@ class GeraGrafico:
         self.line = None
         self.click = False
         self.baseline = None
+        self.baseline_value = 120
 
         self.duration = 600
-        self.variability = 10
+        self.variability = 6
+        self.bpm = 120
 
         self.fig = figure
 
         self.ax1 = self.fig.add_subplot(211, adjustable='box')
-        self.ax1.axis((0, self.duration, 40, 200))
+        self.ax1.axis((0, self.duration, 40, 201))
         self.ax1.grid()
         self.ax1.set_xticks(np.arange(0, self.duration, 30))
         self.ax1.get_xaxis().set_ticklabels([num for num in range(0, 22)])
@@ -43,7 +45,7 @@ class GeraGrafico:
         self.fig.canvas.mpl_connect('motion_notify_event', self.onmotion)
         self.fig.canvas.mpl_connect('key_press_event', self.key_press)
 
-        self.rad = 10
+        self.rad = 3
 
     def gera_valores(self, x, y, amostras=30 ):
         y1 = [n for n in range(y + amostras, y, -1)]
@@ -66,7 +68,7 @@ class GeraGrafico:
 
             else:
                 x, y = self.gera_valores(int(event.xdata), int(event.ydata), amostras=0)
-                self.line = self.ax1.add_line(Line2D(x, y, marker="o"))
+                self.line = self.ax1.add_line(Line2D(x, y, marker="."))
 
                 self.line.set_picker(self.rad)
                 self.line.set_pickradius(self.rad)
@@ -91,7 +93,7 @@ class GeraGrafico:
                 self.line.set_picker(self.rad)
                 self.line.set_pickradius(self.rad)
                 self.annotate = self.ax2.annotate(str(self.count), xy=(event.xdata, event.ydata),
-                                                  xytext=(event.xdata + 5, event.ydata + 5))
+                                                  xytext=(event.xdata + 3, event.ydata + 3))
                 self.count += 1
                 event.canvas.draw()
 
@@ -99,6 +101,13 @@ class GeraGrafico:
         self.click = False
 
     def onmotion(self, event):
+        minutes = int((event.xdata / 30))
+        seconds = ((event.xdata / 30) % 1) * 60 / 100
+        self.position = self.ax1.annotate(f'({minutes + seconds:.2f},{int(event.ydata)})', xy=(event.xdata, event.ydata),
+                          xytext=(event.xdata, event.ydata))
+        event.canvas.draw()
+        self.position.remove()
+
         if self.click and event.inaxes == self.ax1 and self.line is not None:
             for line, text in zip(self.ax1.lines, self.ax1.texts):
                 contem, art = line.contains(event)
@@ -121,37 +130,42 @@ class GeraGrafico:
                     event.canvas.draw()
                     return
 
+
+
     def key_press(self, event):
         if event.key == 'enter':
             # gera para o grafico de batimemntos
             inicio_x = 0
-            inicio_y = 120
-            amostras = []
+            inicio_y = self.baseline_value
+
             valores = []
 
             for line, text in zip(self.ax1.lines, self.ax1.texts):
                 x, y = min(line.get_xdata()), min(line.get_ydata())
-                amostras += np.arange(inicio_x, x, 1).tolist()
-                valores += [v + r for v, r in zip(np.linspace(inicio_y, y, x - inicio_x).tolist(),
-                                                  np.random.randint(-self.variability, self.variability,
-                                                                    x - inicio_x).tolist())]
+                valores += np.linspace(inicio_y, y, self.bpm * (x - inicio_x) / 30).tolist()
+
 
                 inicio_x = x
                 inicio_y = y
+                print(len(valores))
 
             self.ax1.lines.clear()
             self.ax1.texts.clear()
             self.count = 1
 
-            amostras += np.arange(inicio_x, self.duration, 1).tolist()
-            valores += [v + r for v, r in zip(np.linspace(inicio_y, 120, self.duration - inicio_x).tolist(),
-                                              np.random.randint(-self.variability, self.variability,
-                                                                self.duration - inicio_x).tolist())]
+            valores += np.linspace(inicio_y, self.baseline_value, self.bpm * (self.duration - inicio_x) / 30).tolist()
+            amostras = np.linspace(0, self.duration, len(valores)).tolist()
+            variabilidades = np.random.randint(-self.variability, self.variability, len(valores)).tolist()
+
+            valores = [v + r for v, r in zip(valores, variabilidades)]
 
             print(len(amostras))
             print(len(valores))
+            print(len(variabilidades))
 
-            self.ax1.plot(amostras, valores, color='green')
+            self.ax1.plot(amostras, valores, color='green', linewidth=0.5)
+            self.ax1.add_line(self.baseline)
+
 
             #gera para o grafico de contração
             inicio = 0
@@ -164,7 +178,7 @@ class GeraGrafico:
 
             for line, text in zip(self.ax2.lines, self.ax2.texts):
                 x, y = min(line.get_xdata()), min(line.get_ydata())
-                plot_x = np.linspace(x - 80, x + 80, 1000)
+                plot_x = np.linspace(x - 65, x + 65, 300)
                 plot_y = stats.norm.pdf(plot_x, x, scale) * y * factor
 
                 amostras.append(plot_x)
@@ -190,6 +204,8 @@ class GeraGrafico:
             event.canvas.draw()
 
     def gera_baseline(self, value):
+        self.baseline_value = value
+
         if self.baseline is None:
             self.baseline = self.ax1.add_line(Line2D(np.arange(0, self.duration, 1), np.full(shape=self.duration, fill_value=value, dtype=np.int)))
 
