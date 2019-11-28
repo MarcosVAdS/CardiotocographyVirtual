@@ -13,7 +13,7 @@ class GeraGrafico:
         self.baseline_value = 120
 
         self.duration = 600
-        self.variability = 6
+        self.variability = 2
         self.bpm = 120
 
         self.fig = figure
@@ -101,12 +101,23 @@ class GeraGrafico:
         self.click = False
 
     def onmotion(self, event):
-        minutes = int((event.xdata / 30))
-        seconds = ((event.xdata / 30) % 1) * 60 / 100
-        self.position = self.ax1.annotate(f'({minutes + seconds:.2f},{int(event.ydata)})', xy=(event.xdata, event.ydata),
-                          xytext=(event.xdata, event.ydata))
-        event.canvas.draw()
-        self.position.remove()
+        if hasattr(event, 'inaxes') and event.inaxes == self.ax1:
+            minutes = int((event.xdata / 30))
+            seconds = ((event.xdata / 30) % 1) * 60 / 100
+            self.position = self.ax1.annotate(f'({minutes + seconds:.2f},{int(event.ydata)})', xy=(event.xdata, event.ydata),
+                              xytext=(event.xdata, event.ydata))
+            event.canvas.draw()
+            self.position.remove()
+
+        if hasattr(event, 'inaxes') and event.inaxes == self.ax2:
+            minutes = int((event.xdata / 30))
+            seconds = ((event.xdata / 30) % 1) * 60 / 100
+            self.position = self.ax2.annotate(f'({minutes + seconds:.2f},{int(event.ydata)})', xy=(event.xdata, event.ydata),
+                              xytext=(event.xdata, event.ydata))
+            event.canvas.draw()
+            self.position.remove()
+
+
 
         if self.click and event.inaxes == self.ax1 and self.line is not None:
             for line, text in zip(self.ax1.lines, self.ax1.texts):
@@ -117,7 +128,8 @@ class GeraGrafico:
                     text.set_x(event.xdata + 5)
                     text.set_y(event.ydata + 5)
                     event.canvas.draw()
-                    return
+                    self.position.remove()
+
 
         elif self.click and event.inaxes == self.ax2 and self.line is not None:
             for line, text in zip(self.ax2.lines, self.ax2.texts):
@@ -128,7 +140,7 @@ class GeraGrafico:
                     text.set_x(event.xdata + 5)
                     text.set_y(event.ydata + 5)
                     event.canvas.draw()
-                    return
+
 
 
 
@@ -189,9 +201,40 @@ class GeraGrafico:
             self.ax2.texts.clear()
             self.count = 1
 
+            # for pos in range(len(amostras) - 1):
+            #     atual = amostras[pos]
+            #     proxima = amostras[pos + 1]
+            #     menor = min(proxima)
+            #     maior = max(atual)
+            #     media = int((maior+menor)/2)
+            #     atual_index = 0
+            #     proxima_index = 0
+            #
+            #
+            #     for x in range(len(atual)):
+            #         if atual[x] > media:
+            #             atual_index = x
+            #             break
+            #
+            #     for x in range(len(proxima)):
+            #         if proxima[x] > media:
+            #             proxima_index = x
+            #             break
+            #
+            #
+            #     amostras[pos] = np.delete(amostras[pos], [valor for valor in range(atual_index, len(amostras[pos]))])
+            #     valores[pos] = np.delete(valores[pos], [valor for valor in range(atual_index, len(valores[pos]))])
+            #     self.ax2.plot(amostras[pos], valores[pos], color='green')
+            #
+            #     amostras[pos + 1] = np.delete(amostras[pos + 1], [valor for valor in range(proxima_index)])
+            #     valores[pos + 1] = np.delete(valores[pos + 1], [valor for valor in range(proxima_index)])
+            #     self.ax2.plot(amostras[pos + 1], valores[pos + 1], color='green')
+            #
+            # self.ax2.plot(amostras[len(amostras) - 1], valores[len(valores) - 1], color='green')
+
+
             for amostra, valor in zip(amostras, valores):
                 self.ax2.plot(amostra, valor, color='green')
-
 
             event.canvas.draw()
 
