@@ -106,6 +106,9 @@ class PlotFrame(Frame):
         self.graficos = GeraGrafico(plt.figure())
         self.canvas = FigureCanvasTkAgg(self.graficos.fig, master=self)
         self.canvas.draw()
+        self.toolbar = NavigationToolbar2Tk(self.canvas, self)
+        self.toolbar.update()
+        self.canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
 
         self.canvas.mpl_connect('button_press_event', self.graficos.onclick)
         self.bind("<Button-1>", self.graficos.onclick)
@@ -119,14 +122,19 @@ class PlotFrame(Frame):
         self.canvas.mpl_connect('key_press_event', self.graficos.key_press)
         self.bind("<Key>", self.graficos.key_press)
 
-        self.baseline = Entry(self)
+        v = StringVar(self, value='120')
+        self.baseline = Entry(self, textvariable=v)
 
         self.calc_button = Button(self, text="Plotar Linha de Base", width=20)
         self.calc_button["command"] = self.calc_baseline
 
+        self.voltar_button = Button(self, text="Voltar", width=20)
+        self.voltar_button["command"] = self.show_home_frame
+
         self.canvas.get_tk_widget().pack(fill=BOTH, expand=1)
         self.calc_button.pack(side=RIGHT, padx=10, pady=10)
-        self.baseline.pack(side=RIGHT, padx=10, pady=10 )
+        self.baseline.pack(side=RIGHT, padx=10, pady=10)
+        self.voltar_button.pack(side=LEFT, padx=10, pady=10)
 
 
     def calc_baseline(self):
@@ -134,6 +142,11 @@ class PlotFrame(Frame):
         self.graficos.gera_baseline(value)
         self.canvas.get_tk_widget().focus_force()
         self.canvas.draw()
+
+    def show_home_frame(self):
+        self.controller.actual_frame.pack_forget()
+        self.controller.actual_frame = self.controller.home_frame
+        self.controller.actual_frame.pack(fill=BOTH, expand=1)
 
 class TutorialFrame(Frame):
     def __init__(self, master, controller):

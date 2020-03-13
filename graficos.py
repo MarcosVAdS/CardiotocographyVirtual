@@ -20,7 +20,7 @@ class GeraGrafico:
 
         self.ax1 = self.fig.add_subplot(211, adjustable='box')
         self.ax1.axis((0, self.duration, 40, 201))
-        self.ax1.grid()
+        self.ax1.grid(color='red')
         self.ax1.set_xticks(np.arange(0, self.duration, 30))
         self.ax1.get_xaxis().set_ticklabels([num for num in range(0, 22)])
         self.ax1.set_yticks(np.arange(60, 200, 10))
@@ -46,6 +46,9 @@ class GeraGrafico:
         self.fig.canvas.mpl_connect('key_press_event', self.key_press)
 
         self.rad = 3
+
+        self.remove_points = []
+        self.remove_texts = []
 
     def gera_valores(self, x, y, amostras=30 ):
         y1 = [n for n in range(y + amostras, y, -1)]
@@ -75,6 +78,10 @@ class GeraGrafico:
                 self.annotate = self.ax1.annotate(str(self.count), xy=(event.xdata, event.ydata),
                                                           xytext=(event.xdata + 5, event.ydata + 5))
                 self.count += 1
+
+                self.remove_points.append(self.line)
+                self.remove_texts.append(self.annotate)
+
                 event.canvas.draw()
 
         elif event.inaxes == self.ax2:
@@ -95,6 +102,10 @@ class GeraGrafico:
                 self.annotate = self.ax2.annotate(str(self.count), xy=(event.xdata, event.ydata),
                                                   xytext=(event.xdata + 3, event.ydata + 3))
                 self.count += 1
+
+                self.remove_points.append(self.line)
+                self.remove_texts.append(self.annotate)
+
                 event.canvas.draw()
 
     def onrelease(self, event):
@@ -145,105 +156,141 @@ class GeraGrafico:
 
 
     def key_press(self, event):
+
         if event.key == 'enter':
             # gera para o grafico de batimemntos
-            inicio_x = 0
-            inicio_y = self.baseline_value
+            if not self.baseline:
+                pass
 
-            valores = []
+            else:
+                inicio_x = 0
+                inicio_y = self.baseline_value
 
-            for line, text in zip(self.ax1.lines, self.ax1.texts):
-                x, y = min(line.get_xdata()), min(line.get_ydata())
-                valores += np.linspace(inicio_y, y, self.bpm * (x - inicio_x) / 30).tolist()
+                valores = []
+
+                for line, text in zip(self.ax1.lines, self.ax1.texts):
+                    x, y = min(line.get_xdata()), min(line.get_ydata())
+                    valores += np.linspace(inicio_y, y, self.bpm * (x - inicio_x) / 30).tolist()
 
 
-                inicio_x = x
-                inicio_y = y
+                    inicio_x = x
+                    inicio_y = y
+                    print(len(valores))
+
+                self.ax1.lines.clear()
+                self.ax1.texts.clear()
+                self.count = 1
+
+                valores += np.linspace(inicio_y, self.baseline_value, self.bpm * (self.duration - inicio_x) / 30).tolist()
+                amostras = np.linspace(0, self.duration, len(valores)).tolist()
+                variabilidades = np.random.randint(-self.variability, self.variability, len(valores)).tolist()
+
+                valores = [v + r for v, r in zip(valores, variabilidades)]
+
+                print(len(amostras))
                 print(len(valores))
+                print(len(variabilidades))
 
-            self.ax1.lines.clear()
-            self.ax1.texts.clear()
-            self.count = 1
-
-            valores += np.linspace(inicio_y, self.baseline_value, self.bpm * (self.duration - inicio_x) / 30).tolist()
-            amostras = np.linspace(0, self.duration, len(valores)).tolist()
-            variabilidades = np.random.randint(-self.variability, self.variability, len(valores)).tolist()
-
-            valores = [v + r for v, r in zip(valores, variabilidades)]
-
-            print(len(amostras))
-            print(len(valores))
-            print(len(variabilidades))
-
-            self.ax1.plot(amostras, valores, color='green', linewidth=0.5)
-            self.ax1.add_line(self.baseline)
+                self.ax1.plot(amostras, valores, color='green', linewidth=0.5)
+                self.ax1.add_line(self.baseline)
 
 
-            #gera para o grafico de contração
-            inicio = 0
-            amostras = []
-            valores = []
+                #gera para o grafico de contração
+                inicio = 0
+                amostras = []
+                valores = []
 
-            scale = 20            #curvatura da parte superior
-            factor = 2.5 * scale  #regulação da amplitude
-
-
-            for line, text in zip(self.ax2.lines, self.ax2.texts):
-                x, y = min(line.get_xdata()), min(line.get_ydata())
-                plot_x = np.linspace(x - 65, x + 65, 300)
-                plot_y = stats.norm.pdf(plot_x, x, scale) * y * factor
-
-                amostras.append(plot_x)
-                valores.append(plot_y)
+                scale = 20            #curvatura da parte superior
+                factor = 2.5 * scale  #regulação da amplitude
 
 
-            self.ax2.lines.clear()
-            self.ax2.texts.clear()
-            self.count = 1
+                for line, text in zip(self.ax2.lines, self.ax2.texts):
+                    x, y = min(line.get_xdata()), min(line.get_ydata())
+                    plot_x = np.linspace(x - 65, x + 65, 300)
+                    plot_y = stats.norm.pdf(plot_x, x, scale) * y * factor
 
-            # for pos in range(len(amostras) - 1):
-            #     atual = amostras[pos]
-            #     proxima = amostras[pos + 1]
-            #     menor = min(proxima)
-            #     maior = max(atual)
-            #     media = int((maior+menor)/2)
-            #     atual_index = 0
-            #     proxima_index = 0
-            #
-            #
-            #     for x in range(len(atual)):
-            #         if atual[x] > media:
-            #             atual_index = x
-            #             break
-            #
-            #     for x in range(len(proxima)):
-            #         if proxima[x] > media:
-            #             proxima_index = x
-            #             break
-            #
-            #
-            #     amostras[pos] = np.delete(amostras[pos], [valor for valor in range(atual_index, len(amostras[pos]))])
-            #     valores[pos] = np.delete(valores[pos], [valor for valor in range(atual_index, len(valores[pos]))])
-            #     self.ax2.plot(amostras[pos], valores[pos], color='green')
-            #
-            #     amostras[pos + 1] = np.delete(amostras[pos + 1], [valor for valor in range(proxima_index)])
-            #     valores[pos + 1] = np.delete(valores[pos + 1], [valor for valor in range(proxima_index)])
-            #     self.ax2.plot(amostras[pos + 1], valores[pos + 1], color='green')
-            #
-            # self.ax2.plot(amostras[len(amostras) - 1], valores[len(valores) - 1], color='green')
+                    amostras.append(plot_x)
+                    valores.append(plot_y)
 
 
-            for amostra, valor in zip(amostras, valores):
-                self.ax2.plot(amostra, valor, color='green')
+                self.ax2.lines.clear()
+                self.ax2.texts.clear()
+                self.count = 1
 
-            event.canvas.draw()
+                # for pos in range(len(amostras) - 1):
+                #     atual = amostras[pos]
+                #     proxima = amostras[pos + 1]
+                #     menor = min(proxima)
+                #     maior = max(atual)
+                #     media = int((maior+menor)/2)
+                #     atual_index = 0
+                #     proxima_index = 0
+                #
+                #
+                #     for x in range(len(atual)):
+                #         if atual[x] > media:
+                #             atual_index = x
+                #             break
+                #
+                #     for x in range(len(proxima)):
+                #         if proxima[x] > media:
+                #             proxima_index = x
+                #             break
+                #
+                #
+                #     amostras[pos] = np.delete(amostras[pos], [valor for valor in range(atual_index, len(amostras[pos]))])
+                #     valores[pos] = np.delete(valores[pos], [valor for valor in range(atual_index, len(valores[pos]))])
+                #     self.ax2.plot(amostras[pos], valores[pos], color='green')
+                #
+                #     amostras[pos + 1] = np.delete(amostras[pos + 1], [valor for valor in range(proxima_index)])
+                #     valores[pos + 1] = np.delete(valores[pos + 1], [valor for valor in range(proxima_index)])
+                #     self.ax2.plot(amostras[pos + 1], valores[pos + 1], color='green')
+                #
+                # self.ax2.plot(amostras[len(amostras) - 1], valores[len(valores) - 1], color='green')
+
+
+                for amostra, valor in zip(amostras, valores):
+                    self.ax2.plot(amostra, valor, color='green')
+
+                event.canvas.draw()
 
         elif event.key == 'delete':
             self.ax1.lines.clear()
             self.ax1.texts.clear()
             self.ax2.lines.clear()
             self.ax2.texts.clear()
+            self.remove_points.clear()
+            self.remove_texts.clear()
             self.count = 1
+            self.baseline = None
+            self.baseline_value = 120
+
+            event.canvas.draw()
+
+        elif event.key == 'backspace':
+            if len(self.ax1.lines) == 0 and len(self.ax2.lines) == 0:
+                pass
+
+            elif self.line in self.ax1.lines:
+                self.ax1.lines.remove(self.line)
+                self.ax1.texts.remove(self.annotate)
+
+                del self.remove_points[-1]
+                del self.remove_texts[-1]
+
+                self.line = self.remove_points[-1]
+                self.annotate = self.remove_texts[-1]
+
+            elif self.line in self.ax2.lines:
+                self.ax2.lines.remove(self.line)
+                self.ax2.texts.remove(self.annotate)
+
+                del self.remove_points[-1]
+                del self.remove_texts[-1]
+
+                self.line = self.remove_points[-1]
+                self.annotate = self.remove_texts[-1]
+
             event.canvas.draw()
 
     def gera_baseline(self, value):

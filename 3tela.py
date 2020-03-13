@@ -22,7 +22,7 @@ graficos = GeraGrafico(plt.figure())
 
 canvas = FigureCanvasTkAgg(graficos.fig, master=root)  # A tk.DrawingArea.
 canvas.draw()
-canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
+
 
 toolbar = NavigationToolbar2Tk(canvas, root)
 toolbar.update()
