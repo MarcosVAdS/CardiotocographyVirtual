@@ -76,7 +76,7 @@ class GeraGrafico:
                 self.line.set_picker(self.rad)
                 self.line.set_pickradius(self.rad)
                 self.annotate = self.ax1.annotate(str(self.count), xy=(event.xdata, event.ydata),
-                                                          xytext=(event.xdata + 5, event.ydata + 5))
+                                                          xytext=(event.xdata + 5, event.ydata + 5), alpha=0)
                 self.count += 1
 
                 self.remove_points.append(self.line)
@@ -100,7 +100,7 @@ class GeraGrafico:
                 self.line.set_picker(self.rad)
                 self.line.set_pickradius(self.rad)
                 self.annotate = self.ax2.annotate(str(self.count), xy=(event.xdata, event.ydata),
-                                                  xytext=(event.xdata + 3, event.ydata + 3))
+                                                  xytext=(event.xdata + 3, event.ydata + 3), alpha=0)
                 self.count += 1
 
                 self.remove_points.append(self.line)
