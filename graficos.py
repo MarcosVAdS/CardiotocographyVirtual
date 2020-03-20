@@ -30,12 +30,12 @@ class GeraGrafico:
 
         self.ax2 = self.fig.add_subplot(212, adjustable='box')
         self.ax2.axis((0, self.duration, 0, 100))
-        self.ax2.grid()
+        self.ax2.grid(color='red')
         self.ax2.set_xticks(np.arange(0, self.duration, 30))
         self.ax2.get_xaxis().set_ticklabels([num for num in range(0, 22)])
         self.ax2.set_yticks(np.arange(0, 100, 10))
         self.ax2.set_title('Contrações uterinas')
-        self.ax2.set_xlabel('Tempo [min]')
+        self.ax2.set_xlabel('Milímetros [mm]')
         self.ax2.set_ylabel('a.u.')
 
         self.annotate = None
@@ -278,8 +278,13 @@ class GeraGrafico:
                 del self.remove_points[-1]
                 del self.remove_texts[-1]
 
-                self.line = self.remove_points[-1]
-                self.annotate = self.remove_texts[-1]
+                if len(self.remove_points):
+                    self.line = self.remove_points[-1]
+                    self.annotate = self.remove_texts[-1]
+                else:
+                    self.line = None
+                    self.annotate = None
+
 
             elif self.line in self.ax2.lines:
                 self.ax2.lines.remove(self.line)
@@ -288,8 +293,12 @@ class GeraGrafico:
                 del self.remove_points[-1]
                 del self.remove_texts[-1]
 
-                self.line = self.remove_points[-1]
-                self.annotate = self.remove_texts[-1]
+                if len(self.remove_points):
+                    self.line = self.remove_points[-1]
+                    self.annotate = self.remove_texts[-1]
+                else:
+                    self.line = None
+                    self.annotate = None
 
             event.canvas.draw()
 
