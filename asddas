@@ -1,0 +1,26 @@
+self.mylist = Listbox(self, yscrollcommand=self.scroll.set)
+
+        image1 = Image.open("images/tela_de_plot.JPG").resize((1000, 500), Image.ANTIALIAS)
+        image2 = Image.open("images/tela_marcada.JPG").resize((1000, 500), Image.ANTIALIAS)
+        image3 = Image.open("images/tela_grafico.JPG").resize((1000, 500), Image.ANTIALIAS)
+        photo1 = ImageTk.PhotoImage(image1)
+        photo2 = ImageTk.PhotoImage(image2)
+        photo3 = ImageTk.PhotoImage(image3)
+
+        self.label1 = Label(self.mylist, image=photo1)
+        self.label1.image = photo1  # keep a reference!
+        self.label1.pack()
+
+
+        self.label2 = Label(self.mylist, image=photo2)
+        self.label2.image = photo2  # keep a reference!
+        self.label2.pack()
+
+        self.label3 = Label(self.mylist, image=photo3)
+        self.label3.image = photo3  # keep a reference!
+        self.label3.pack()
+
+
+        self.mylist.insert(END, self.label1)
+        self.mylist.insert(END, self.label2)
+        self.mylist.insert(END, self.label3)
