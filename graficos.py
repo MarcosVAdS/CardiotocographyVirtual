@@ -170,7 +170,7 @@ class GeraGrafico:
 
                 for line, text in zip(self.ax1.lines, self.ax1.texts):
                     x, y = min(line.get_xdata()), min(line.get_ydata())
-                    valores += np.linspace(inicio_y, y, self.bpm * (x - inicio_x) / 30).tolist()
+                    valores += np.linspace(inicio_y, y, self.bpm * int((x - inicio_x) / 30)).tolist()
 
 
                     inicio_x = x
@@ -181,7 +181,7 @@ class GeraGrafico:
                 self.ax1.texts.clear()
                 self.count = 1
 
-                valores += np.linspace(inicio_y, self.baseline_value, self.bpm * (self.duration - inicio_x) / 30).tolist()
+                valores += np.linspace(inicio_y, self.baseline_value, self.bpm * int((self.duration - inicio_x) / 30)).tolist()
                 amostras = np.linspace(0, self.duration, len(valores)).tolist()
                 variabilidades = np.random.randint(-self.variability, self.variability, len(valores)).tolist()
 

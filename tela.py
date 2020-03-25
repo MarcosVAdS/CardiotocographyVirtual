@@ -1,4 +1,4 @@
-from tkinter import *
+from tkinter import Tk, Frame, Label, Button, BOTH, StringVar, TOP, Canvas, RIGHT, LEFT, Entry
 import matplotlib.pyplot as plt
 from graficos import GeraGrafico
 from matplotlib.backends.backend_tkagg import (
@@ -155,16 +155,14 @@ class TutorialFrame(Frame):
         self.controller = controller
         self["bg"] = ("#5271FF")
 
-        image = Image.open("images/tela_de_plot.jpg")
-        photo = ImageTk.PhotoImage(image)
+        #image = Image.open("../images/tela_de_plot.JPG")
+        #photo = ImageTk.PhotoImage(image)
 
-        self.canvas = Canvas(self, width=image.width, height=image.height)
-        self.canvas.create_image(0, 0, image=photo)
-        self.canvas.pack()
-
-
+        #self.canvas = Canvas(self, width=image.width, height=image.height)
+        #self.canvas.create_image(0, 0, image=photo)
+        #self.canvas.pack()
 
 
 
-if __name__ == '__main__':
-    Aplicacao()
+
+
