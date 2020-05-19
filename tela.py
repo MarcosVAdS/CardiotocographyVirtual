@@ -122,20 +122,33 @@ class PlotFrame(Frame):
         self.canvas.mpl_connect('key_press_event', self.graficos.key_press)
         self.bind("<Key>", self.graficos.key_press)
 
-        v = StringVar(self, value='120')
-        self.baseline = Entry(self, textvariable=v)
+        b = StringVar(self, value='120')
+        self.baseline = Entry(self, textvariable=b)
 
-        self.calc_button = Button(self, text="Plotar Linha de Base", width=20)
-        self.calc_button["command"] = self.calc_baseline
+        self.baseline_button = Button(self, text="Plotar Linha de Base", width=20)
+        self.baseline_button["command"] = self.calc_baseline
+
+
+        v = StringVar(self, value='2')
+        self.entry_variability = Entry(self, textvariable=v)
+
+        self.variability_button = Button(self, text="Variância", width=20)
+        self.variability_button["command"] = self.give_variability
 
         self.voltar_button = Button(self, text="Voltar", width=20)
         self.voltar_button["command"] = self.show_home_frame
 
         self.canvas.get_tk_widget().pack(fill=BOTH, expand=1)
-        self.calc_button.pack(side=RIGHT, padx=10, pady=10)
-        self.baseline.pack(side=RIGHT, padx=10, pady=10)
+        self.baseline_button.pack(side=RIGHT, padx=10, pady=10)
+        self.baseline.pack(side=RIGHT, padx=10, pady=10)        
+        self.variability_button.pack(side=RIGHT, padx=10, pady=10)
+        self.entry_variability.pack(side=RIGHT, padx=10, pady=10)
         self.voltar_button.pack(side=LEFT, padx=10, pady=10)
 
+    def give_variability(self):
+        value_variability = int(self.entry_variability.get())
+        self.graficos.variability = value_variability
+        
 
     def calc_baseline(self):
         value = int(self.baseline.get())
