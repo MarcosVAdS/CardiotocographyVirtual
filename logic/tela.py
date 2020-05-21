@@ -1,6 +1,6 @@
 from tkinter import Tk, Frame, Label, Button, BOTH, StringVar, TOP, Canvas, RIGHT, LEFT, Entry
 import matplotlib.pyplot as plt
-from graficos import GeraGrafico
+from logic.graficos import GeraGrafico
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
 

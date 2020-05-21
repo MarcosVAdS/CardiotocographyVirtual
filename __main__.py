@@ -1,3 +1,3 @@
-from tela import Aplicacao
+from logic.tela import Aplicacao
 
 Aplicacao()

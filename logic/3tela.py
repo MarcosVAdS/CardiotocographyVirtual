@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 
-from graficos import GeraGrafico
+from logic.graficos import GeraGrafico
 
 
 
