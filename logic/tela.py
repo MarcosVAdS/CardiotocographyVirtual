@@ -5,6 +5,7 @@ from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
 
 from PIL import ImageTk, Image
+import os
 
 class Aplicacao:
     def __init__(self):
@@ -21,6 +22,8 @@ class Aplicacao:
 
         self.actual_frame = self.home_frame
         self.actual_frame.pack()
+        self.data_folder = os.path.join("video")
+        self.file_to_open = os.path.join(self.data_folder, "tutorial.mkv")
 
         self.root.mainloop()
 
@@ -59,9 +62,8 @@ class HomeFrame(Frame):
         self.controller.actual_frame.show_plot_frame()
 
     def show_tutorial_frame(self):
-        self.controller.actual_frame.pack_forget()
-        self.controller.actual_frame = self.controller.tutorial_frame
-        self.controller.actual_frame.pack(fill=BOTH, expand=1)
+        os.startfile(file_to_open)
+        
 
 
 class ConfigFrame(Frame):
