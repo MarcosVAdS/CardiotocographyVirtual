@@ -22,8 +22,6 @@ class Aplicacao:
 
         self.actual_frame = self.home_frame
         self.actual_frame.pack()
-        self.data_folder = os.path.join("video")
-        self.file_to_open = os.path.join(self.data_folder, "tutorial.mkv")
 
         self.root.mainloop()
 
@@ -62,6 +60,8 @@ class HomeFrame(Frame):
         self.controller.actual_frame.show_plot_frame()
 
     def show_tutorial_frame(self):
+        data_folder = os.path.join("video")
+        file_to_open = os.path.join(data_folder, "tutorial.mp4")
         os.startfile(file_to_open)
         
 
