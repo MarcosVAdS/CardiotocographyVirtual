@@ -132,7 +132,7 @@ class PlotFrame(Frame):
         v = StringVar(self, value='2')
         self.entry_variability = Entry(self, textvariable=v)
 
-        self.variability_button = Button(self, text="Variância", width=20)
+        self.variability_button = Button(self, text="Variabilidade", width=20)
         self.variability_button["command"] = self.give_variability
 
         self.voltar_button = Button(self, text="Voltar", width=20)

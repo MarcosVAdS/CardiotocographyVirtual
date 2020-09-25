@@ -175,7 +175,7 @@ class GeraGrafico:
 
                     inicio_x = x
                     inicio_y = y
-                    print(len(valores))
+                    #print(len(valores))
 
                 self.ax1.lines.clear()
                 self.ax1.texts.clear()
@@ -187,12 +187,12 @@ class GeraGrafico:
 
                 valores = [v + r for v, r in zip(valores, variabilidades)]
 
-                print(len(amostras))
-                print(len(valores))
-                print(len(variabilidades))
+                #print(len(amostras))
+                #print(len(valores))
+                #print(len(variabilidades))
 
                 self.ax1.plot(amostras, valores, color='green', linewidth=0.5)
-                self.ax1.add_line(self.baseline)
+                #self.ax1.add_line(self.baseline)
 
 
                 #gera para o grafico de contração
