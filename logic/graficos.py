@@ -35,8 +35,8 @@ class GeraGrafico:
         self.ax2.get_xaxis().set_ticklabels([num for num in range(0, 22)])
         self.ax2.set_yticks(np.arange(0, 100, 10))
         self.ax2.set_title('Contrações uterinas')
-        self.ax2.set_xlabel('Milímetros [mm]')
-        self.ax2.set_ylabel('a.u.')
+        self.ax2.set_xlabel('Centimetros [cm]')
+        self.ax2.set_ylabel('UC')
 
         self.annotate = None
         self.count = 1
